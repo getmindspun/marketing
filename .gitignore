@@ -1,0 +1,8 @@
+.env
+.idea
+node_modules
+pyenv
+*.egg-info
+/credentials.json
+/token.json
+/store

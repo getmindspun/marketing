@@ -1,0 +1,12 @@
+--- node_modules/lighthouse/lighthouse-core/gather/driver/network.js	1985-10-26 01:15:00.000000000 -0700
++++ ../wp/marketing/node_modules/lighthouse/lighthouse-core/gather/driver/network.js	2022-04-24 10:37:58.000000000 -0700
+@@ -20,6 +20,9 @@
+ 
+   // Encoding issues may lead to hanging getResponseBody calls: https://github.com/GoogleChrome/lighthouse/pull/4718
+   // session.sendCommand will handle timeout after 1s.
++  if (timeout < 5000) {
++      timeout = 5000;
++  }
+   session.setNextProtocolTimeout(timeout);
+   const result = await session.sendCommand('Network.getResponseBody', {requestId});
+   return result.body;
