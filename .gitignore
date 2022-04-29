@@ -1,5 +1,8 @@
 .env
+.env.*
 .idea
+.coverage
+.pytest_cache
 node_modules
 pyenv
 *.egg-info

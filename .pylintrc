@@ -351,7 +351,7 @@ single-line-if-stmt=no
 [SIMILARITIES]
 
 # Ignore comments when computing similarities.
-ignore-comments=yes
+ignore-comments=no
 
 # Ignore docstrings when computing similarities.
 ignore-docstrings=yes

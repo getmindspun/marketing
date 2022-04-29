@@ -1,0 +1,7 @@
+Generic single-database configuration.
+
+Make sure database is up-to-date via (same as upgrade head)
+./manage.py migrate
+
+alembic -c api/alembic.ini revision --autogenerate -m "Descriptions of the revision"
+alembic -c api/alembic.ini upgrade head

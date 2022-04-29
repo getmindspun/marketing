@@ -1,9 +1,22 @@
 """ Settings """
-import os
+from starlette.config import Config
+from starlette.datastructures import Secret, URL
 
-HUBSPOT_API_KEY = os.environ["HUBSPOT_API_KEY"]
+VERSION = "2023.4.28"
 
-BROWSER_IP = os.environ.get("BROWSER_IP", "137.184.183.28")
+config = Config(".env")  # pylint: disable=invalid-name
+LOG_LEVEL = config("LOG_LEVEL", default="INFO", cast=str)
+SECRET = config("SECRET", cast=Secret)
+ROOT_PATH = config("ROOT_PATH", default="", cast=str)
+HUBSPOT_API_KEY = config("HUBSPOT_API_KEY")
+BROWSER_IP = config("BROWSER_IP", default="137.184.183.28")
+
+DATABASE_URL = config("DATABASE_URL", cast=URL)
+MYSQL_ROOT_PASSWORD = config("MYSQL_ROOT_PASSWORD", default=None)
+if MYSQL_ROOT_PASSWORD:
+    DATABASE_URL = DATABASE_URL.replace(
+        username="root", password=MYSQL_ROOT_PASSWORD
+    )
 
 GOOGLE_API_SCOPES = [
     "https://www.googleapis.com/auth/drive",

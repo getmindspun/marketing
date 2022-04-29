@@ -21,14 +21,22 @@ setuptools.setup(
     long_description=get_long_description(),
     long_description_content_type="text/markdown",
     packages=setuptools.find_packages(),
+    package_data={"marketing": ["templates/*", "assets/*"]},
     python_requires=">=3.5",
     install_requires=[
         "addict",
+        "alembic<1.7",
+        "bson",
+        "click",
+        "fastapi",
         "google-api-python-client",
         "google-auth-httplib2",
         "google-auth-oauthlib",
         "hubspot-api-client",
+        "mysqlclient",
         "python-dotenv",
+        "sqlalchemy",
+        "sqlalchemy_utils",
         "tld"
     ],
     extras_require={

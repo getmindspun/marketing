@@ -38,7 +38,9 @@ class Gmail:
 
     def send(self, message: MIMEBase, user_id="me"):
         """ Send an email """
-        body = {"raw": base64.urlsafe_b64encode(message.as_bytes()).decode("utf-8")}
+        body = {
+            "raw": base64.urlsafe_b64encode(message.as_bytes()).decode("utf-8")
+        }
         return self.service.users().messages().send(
             userId=user_id, body=body
         ) .execute()
