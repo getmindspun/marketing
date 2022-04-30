@@ -13,6 +13,7 @@ from alembic.config import Config
 from sqlalchemy_utils import database_exists, create_database
 
 from marketing import models, settings
+from marketing.send import send as marketing_send
 
 
 @click.group()
@@ -94,7 +95,7 @@ def delete_email_from_campaign(email_id: str):
 @cli.command()
 @click.option("--name", "--campaign", prompt="Campaign name")
 @click.option("--template", prompt="Email template")
-@click.option("--delay", default=0, show_default=True)
+@click.option("--delay", default=0, show_default=True, prompt=True)
 @click.option("--order", default=-1, show_default=False)
 def add_email_to_campaign(name: str, template: str, delay: int, order: int):
     """ Add a new (empty) campaign """
@@ -108,17 +109,20 @@ def add_email_to_campaign(name: str, template: str, delay: int, order: int):
     if order < 0:
         order = 0
         if campaign.emails:
-            order = campaign.emails[-1].order + 1000
+            order = campaign.emails[-1].send_order + 1000
 
     email = models.CampaignEmail.create(
         campaign_id=campaign.id,
         template=template,
         send_delay=delay,
-        order=order
+        send_order=order
     )
     session.add(email)
     session.commit()
-    click.echo(f"Campaign email created '{email.id}' with order {order}")
+    click.echo(
+        f"Campaign email created '{email.id}' "
+        f"with delay {delay} and order {order}"
+    )
 
 
 @cli.command()
@@ -126,7 +130,52 @@ def add_email_to_campaign(name: str, template: str, delay: int, order: int):
 @click.option("--name", "--campaign", prompt="Campaign name")
 @click.option("--data", prompt=True, default="{}")
 def add_contact_to_campaign(email: str, name: str, data: str):
-    """ Add a new (empty) campaign """
+    """ Add a contact email to a campaign """
+    session = models.Session()
+
+    contact = models.Contact.get_by_email(session, email)
+    if contact:
+        if contact.unsubscribed:
+            click.echo(f"Contact {email} is unsubscribed.")
+            return
+    else:
+        contact = models.Contact.create(email=email)
+        session.add(contact)
+        session.commit()
+        click.echo(f"Contact created '{email}'")
+
+    campaign = models.Campaign.get_by_name(session, name)
+    if not campaign:
+        click.echo(f"Campaign not found '{name}'")
+        return
+
+    last_id = None
+    for campaign_email in campaign.emails:
+        send_at = datetime.utcnow() +\
+                  timedelta(seconds=campaign_email.send_delay)
+        oid = models.Pending.generate_oid()
+        pending = models.Pending.create(
+            id=oid,
+            campaign_email_id=campaign_email.id,
+            contact_id=contact.id,
+            send_at=send_at,
+            prior_email_id=last_id if last_id else None,
+            data=data
+        )
+        session.add(pending)
+        last_id = oid
+
+    session.commit()
+
+    count = len(campaign.emails)
+    click.echo(f"Contact '{email}' added to campaign '{name}': {count} emails")
+
+
+@cli.command()
+@click.option("--email", prompt="Contact email")
+@click.option("--name", "--campaign", prompt="Campaign name")
+def delete_contact_from_campaign(email: str, name: str):
+    """ Remove contact from a campaign by cancelling all pending emails """
     session = models.Session()
 
     contact = models.Contact.get_by_email(session, email)
@@ -141,28 +190,16 @@ def add_contact_to_campaign(email: str, name: str, data: str):
         click.echo(f"Campaign not found '{name}'")
         return
 
-    last = None
-    for campaign_email in campaign.emails:
-        send_at = datetime.utcnow() +\
-                  timedelta(seconds=campaign_email.send_delay)
-        pending = models.Pending.create(
-            campaign_id=campaign.id,
-            contact_id=contact.id,
-            send_at=send_at,
-            prior_email_id=last.id if last else None,
-            data=data
-        )
-        session.add(pending)
-
-    session.commit()
-
-    count = len(campaign.emails)
-    click.echo(f"Contact '{email}' added to campaign '{name}': {count} emails")
+    count = models.Pending.delete_contact_from_campaign(
+        session, contact_id=contact.id, campaign_id=campaign.id
+    )
+    print(f"Deleted {count} pending email(s)")
 
 
 @cli.command()
 def send():
     """ Send any pending emails """
+    marketing_send()
 
 
 @cli.command(context_settings=dict(

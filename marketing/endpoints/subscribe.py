@@ -17,10 +17,13 @@ def unsubscribe(
         raise exceptions.HTTPException(400)
 
     contact.unsubscribe()
+    models.Pending.delete_for_contact(
+        session, contact_id=contact_id, commit=False
+    )
     session.commit()
 
     return HTMLResponse(
-        content=utils.template("unsubscribed", contact_id=contact_id)
+        content=utils.render_template("unsubscribed", contact_id=contact_id)
     )
 
 
@@ -38,5 +41,5 @@ def resubscribe(
     session.commit()
 
     return HTMLResponse(
-        content=utils.template("resubscribed", contact_id=contact_id)
+        content=utils.render_template("resubscribed", contact_id=contact_id)
     )

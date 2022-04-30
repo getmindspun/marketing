@@ -37,6 +37,7 @@ class Sent(BASE, DefaultMixin):
     sent_at = sqlalchemy.Column(
         sqlalchemy.DateTime(timezone=True),
         nullable=False,
+        index=True
     )
 
     opened_at = sqlalchemy.Column(
@@ -54,7 +55,12 @@ class Sent(BASE, DefaultMixin):
         nullable=False
     )
 
-    email_thread_id = sqlalchemy.Column(
+    message_id = sqlalchemy.Column(
+        sqlalchemy.String(256),
+        nullable=False
+    )
+
+    thread_id = sqlalchemy.Column(
         sqlalchemy.String(64),
         nullable=False
     )

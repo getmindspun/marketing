@@ -11,7 +11,7 @@ pylint_pkg:
 .PHONY: pylint_pkg
 
 pylint_scripts:
-	pylint scripts/*.py --disable=invalid-name
+	pylint scripts/*.py --disable=invalid-name,duplicate-code
 .PHONY: pylint_scripts
 
 pylint_tests:

@@ -34,6 +34,7 @@ setuptools.setup(
         "google-auth-oauthlib",
         "hubspot-api-client",
         "mysqlclient",
+        "pybars3",
         "python-dotenv",
         "sqlalchemy",
         "sqlalchemy_utils",

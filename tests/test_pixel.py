@@ -18,7 +18,8 @@ def test_pixel(client, session):
     sent = models.Sent.create(
         sent_at=datetime.utcnow(),
         email_id="123",
-        email_thread_id="456"
+        message_id="456",
+        thread_id="789"
     )
     sent.contact = contact
     sent.campaign_email = campaign_email

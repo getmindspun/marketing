@@ -1,4 +1,4 @@
-""" List gmail drafts """
+""" Send gmail """
 import argparse
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText

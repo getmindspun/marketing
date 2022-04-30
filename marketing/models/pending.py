@@ -1,12 +1,15 @@
 """ Pending emails """
+import json
 import logging
 
 import sqlalchemy
 from sqlalchemy.orm import relationship
 
-from .base import BASE
+from .base import BASE, Session
 from .mixins import DefaultMixin
 
+from .campaign_emails import CampaignEmail
+from .campaigns import Campaign
 
 logger = logging.getLogger(__name__)
 
@@ -50,3 +53,45 @@ class Pending(BASE, DefaultMixin):
 
     contact = relationship("Contact")
     campaign_email = relationship("CampaignEmail")
+
+    def as_data(self):
+        """ Convert this object to template data """
+        base = self.as_dict()
+        data = base.pop("data")
+        obj = json.loads(data) if data else {}
+        obj.update(base)
+        return obj
+
+    @classmethod
+    def delete_contact_from_campaign(
+            cls,
+            session: Session,
+            contact_id: str,
+            campaign_id: str,
+            commit=True
+    ) -> int:
+        """ Remove all pending emails for this contact/campaign """
+        count = session.query(Pending) \
+            .filter(Pending.contact_id == contact_id,
+                    Pending.campaign_email_id == CampaignEmail.id,
+                    CampaignEmail.campaign_id == Campaign.id,
+                    Campaign.id == campaign_id) \
+            .delete(synchronize_session=False)
+        if commit:
+            session.commit()
+        return count
+
+    @classmethod
+    def delete_for_contact(
+            cls,
+            session: Session,
+            contact_id: str,
+            commit=True
+    ) -> int:
+        """ Remove all pending emails for this contact/campaign """
+        count = session.query(Pending) \
+            .filter(Pending.contact_id == contact_id)\
+            .delete(synchronize_session=False)
+        if commit:
+            session.commit()
+        return count

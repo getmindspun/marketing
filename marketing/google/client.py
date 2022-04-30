@@ -5,7 +5,7 @@ from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 
-from .settings import GOOGLE_API_SCOPES
+from marketing.settings import GOOGLE_API_SCOPES
 from .gmail import Gmail
 
 

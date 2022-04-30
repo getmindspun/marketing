@@ -1,8 +1,11 @@
 """ Utility functions """
 import os
-from fastapi.requests import Request
-from mako.template import Template
+import typing
 
+from fastapi.requests import Request
+from pybars import Compiler
+
+PYBARS_COMPILER = Compiler()
 ASSETS_PATH = os.path.join(os.path.dirname(__file__), "assets")
 TEMPLATE_PATH = os.path.join(os.path.dirname(__file__), "templates")
 
@@ -39,12 +42,21 @@ def isoformat(value) -> str:
     return result
 
 
-def template(name: str, **kwargs) -> str:
-    """ Render the HTML as a Mako template """
+def render(source: str, **kwargs) -> str:
+    """ Render as a Handlerbars template """
+    template = PYBARS_COMPILER.compile(source)
+    return template(kwargs)
+
+
+def render_template(name: str, **kwargs) -> str:
+    """ Render the named template as Handlebars """
     if not name.endswith(".html"):
         name = name + ".html"
     path = os.path.join(TEMPLATE_PATH, name)
-    return Template(filename=path).render(**kwargs)
+    with open(path, "r", encoding="utf-8") as fp:
+        source = fp.read()
+
+    return render(source, **kwargs)
 
 
 def asset_path(name: str) -> str:
@@ -57,3 +69,13 @@ def asset(name: str) -> bytes:
     path = asset_path(name)
     with open(path, "rb") as fp:
         return fp.read()
+
+
+def get_message_header_value(message: dict, name: str) -> typing.Optional[str]:
+    """ Get a header value from the specified message """
+    payload = message.get("payload", {})
+    headers = payload.get("headers", [])
+    for header in headers:
+        if header["name"] == name:
+            return header["value"]
+    return None
