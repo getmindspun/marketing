@@ -18,6 +18,8 @@ def setup_logging():
     formatter = logging.Formatter(settings.LOG_FORMAT, settings.LOG_DATEFMT)
 
     marketing = logging.getLogger("marketing")
+    marketing.setLevel(settings.LOG_LEVEL)
+    marketing.propagate = False
 
     if settings.LOG_PATH:
         handler = RotatingFileHandler(

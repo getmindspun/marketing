@@ -14,9 +14,6 @@ from sqlalchemy_utils import database_exists, create_database
 
 from marketing import models, settings
 from marketing.send import send as marketing_send
-from marketing.main import setup_logging
-
-setup_logging()
 
 
 @click.group()
