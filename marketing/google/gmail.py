@@ -12,6 +12,19 @@ from googleapiclient.discovery import build
 from marketing import utils, settings
 
 
+FOOTER = """
+<div style="width:100%;text-align:left">
+<p>
+Don't want to receive emails from me?
+<a href="https://api.mindspun.com/marketing/unsubscribe?id={{contact_id}}">
+Unsubscribe
+</a>
+</p>
+<img src="https://api.mindspun.com/marketing/pixel.png?id={{id}}">
+</div>
+"""
+
+
 class GmailDraft(addict.Dict):
     """ Gmail draft message """
     @property
@@ -120,6 +133,7 @@ class Gmail:
 
         html = draft.html()
         if html:
+            html += FOOTER
             part = MIMEText(utils.render(html, **data), "html")
         else:
             part = MIMEText(utils.render(draft.text(), **data), "text")
