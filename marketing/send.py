@@ -77,7 +77,7 @@ def send_one(
 
         if client.gmail.thread_responses(thread_id=thread_id):
             logger.info("%s responded, ending drip", contact.email)
-            models.Pending.delete(
+            models.Pending.delete_contact_from_campaign(
                 session,
                 contact_id=contact.id,
                 campaign_id=campaign_email.campaign_id
@@ -114,7 +114,12 @@ def send(session: models.Session = None, client: GoogleApiClient = None):
     if client is None:
         client = GoogleApiClient()
 
+    count = 0
     remaining = settings.MAX_EMAILS_PER_DAY - emails_sent_in_last_day(session)
     for email in pending(session, limit=remaining):  # exhaust cursor
         send_one(client, session, email)
+        count += 1
         time.sleep(1)
+
+    if count:
+        logger.info("sent %d email(s)", count)
