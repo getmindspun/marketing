@@ -19,9 +19,9 @@ def setup_logging():
 
     marketing = logging.getLogger("marketing")
 
-    if settings.LOG_FILENAME:
+    if settings.LOG_PATH:
         handler = RotatingFileHandler(
-            settings.LOG_FILENAME,
+            settings.LOG_PATH,
             maxBytes=settings.LOG_MAX_BYTES,
             backupCount=settings.LOG_BACKUP_COUNT
         )

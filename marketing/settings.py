@@ -12,7 +12,7 @@ LOG_DATEFMT = "%Y-%m-%dT%H:%M:%S"
 
 config = Config(".env")  # pylint: disable=invalid-name
 LOG_LEVEL = config("LOG_LEVEL", default="INFO")
-LOG_FILENAME = config("LOG_FILENAME", default=None)
+LOG_PATH = config("LOG_PATH", default=None)
 LOG_BACKUP_COUNT = config("LOG_BACKUP_COUNT", default=5)
 LOG_MAX_BYTES = config("LOG_MAX_BYTES", default=10*1024*1024)
 

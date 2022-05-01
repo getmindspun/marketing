@@ -14,10 +14,10 @@ services:
       - DATABASE_URL=mysql+mysqldb://mysql:3306/marketing
       - GUNICORN_CMD_ARGS=--bind=0.0.0.0:8000 --workers=4 --access-logfile='-'
       - ROOT_PATH=/marketing
-      - LOG_PATH=/var/log/marketing/marketing.log
+      - LOG_PATH=/var/log/mindspun/marketing.log
     volumes:
-      - /var/log/marketing/:/var/log/marketing/
-      - ./marketing/credentials.json:/app/credentials.json
+      - /var/log/mindspun/:/var/log/mindspun/
+      - ./marketing/service_account.json:/app/service_account.json
 
 networks:
   mindspun:
