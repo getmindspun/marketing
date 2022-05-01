@@ -1,0 +1,25 @@
+version: '3.8'
+services:
+  marketing:
+    container_name: marketing
+    image: registry.digitalocean.com/mindspun/marketing:latest
+    restart: always
+    stdin_open: true
+    tty: true
+    networks:
+      - mindspun
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=mysql+mysqldb://mysql:3306/marketing
+      - GUNICORN_CMD_ARGS=--bind=0.0.0.0:8000 --workers=4 --access-logfile='-'
+      - ROOT_PATH=/marketing
+      - LOG_PATH=/var/log/marketing/marketing.log
+    volumes:
+      - /var/log/marketing/:/var/log/marketing/
+      - ./marketing/credentials.json:/app/credentials.json
+
+networks:
+  mindspun:
+    external:
+      name: mindspun

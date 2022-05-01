@@ -1,5 +1,6 @@
 """ Main entry point """
 import logging
+from logging.handlers import RotatingFileHandler
 
 import fastapi
 from fastapi.exceptions import RequestValidationError
@@ -10,6 +11,26 @@ from . import settings, middleware
 
 
 logger = logging.getLogger(__name__)
+
+
+def setup_logging():
+    """ Setup logging """
+    formatter = logging.Formatter(settings.LOG_FORMAT, settings.LOG_DATEFMT)
+
+    marketing = logging.getLogger("marketing")
+
+    if settings.LOG_FILENAME:
+        handler = RotatingFileHandler(
+            settings.LOG_FILENAME,
+            maxBytes=settings.LOG_MAX_BYTES,
+            backupCount=settings.LOG_BACKUP_COUNT
+        )
+    else:
+        handler = logging.StreamHandler()
+
+    handler.setFormatter(formatter)
+    handler.setLevel(settings.LOG_LEVEL)
+    marketing.addHandler(handler)
 
 
 async def validation_exception_handler(
@@ -27,8 +48,7 @@ async def validation_exception_handler(
 
 def make_app() -> fastapi.FastAPI:
     """ Create the fastapi application """
-    log_level = getattr(logging, str(settings.LOG_LEVEL).upper())
-    logging.basicConfig(level=log_level)
+    setup_logging()
 
     application = fastapi.FastAPI(
         title="Mindspun Marketing API",

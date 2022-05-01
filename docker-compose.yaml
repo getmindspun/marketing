@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  marketing:
+    container_name: marketing
+    build:
+      context: .
+    image: marketing:latest
+    restart: always
+    stdin_open: true
+    tty: true
+    ports:
+      - "8000:8000"
+    networks:
+      - mindspun
+    cap_add:
+      - SYS_ADMIN
+    env_file:
+      - .env
+    environment:
+      - GUNICORN_CMD_ARGS=--bind=0.0.0.0:8000 --workers=4 --access-logfile='-'
+    volumes:
+      - ./credentials.json:/app/credentials.json
+      - ./token.json:/app/token.json
+
+networks:
+  mindspun:
+    external:
+      name: mindspun

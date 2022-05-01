@@ -6,6 +6,5 @@
 node_modules
 pyenv
 *.egg-info
-/credentials.json
-/token.json
+/service_account.json
 /store

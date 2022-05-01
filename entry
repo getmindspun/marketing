@@ -1,0 +1,22 @@
+#!/bin/bash
+set -e
+
+if [[ -z "${WEB_CONCURRENCY}" ]]; then
+    WEB_CONCURRENCY=4
+fi
+
+if [[ -z $1 ]]; then
+    exec gunicorn marketing.main:app -w ${WEB_CONCURRENCY} -k uvicorn.workers.UvicornWorker
+else
+    action=$1
+    shift
+    case ${action} in
+        manage)
+            exec python3 manage.py "$@"
+            ;;
+        *)
+            echo "${action} $@"
+            exec ${action} "$@"
+            ;;
+    esac
+fi

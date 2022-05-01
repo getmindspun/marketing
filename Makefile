@@ -1,4 +1,9 @@
 NAME := marketing
+REPO := registry.digitalocean.com/mindspun/$(NAME)
+
+BRANCH = $(shell git symbolic-ref --short -q HEAD)
+SHA = $(shell git rev-parse --short HEAD)
+VERSION = $(BRANCH)-$(SHA)
 
 all: lint test
 
@@ -31,3 +36,26 @@ test:
 coverage:
 	PYTHONPATH=. pytest --cov=$(NAME) --cov-report=term-missing --cov-fail-under=100 tests/
 .PHONY: coverage
+
+freeze:
+	pyenv/bin/pip3 freeze | egrep -v "egg\=$(NAME)|pkg-resources" > requirements.txt
+.PHONY: freeze
+
+build:
+	docker-compose build $(NAME)
+	docker tag $(NAME) $(REPO):$(VERSION)
+	@echo Tagged $(VERSION)
+.PHONY: docker-build
+
+push:
+	docker push $(REPO):$(VERSION)
+.PHONY: push
+
+deploy: build push
+	scp production.yaml api:/var/mindspun/docker-compose.marketing.yaml
+	ssh api /snap/bin/doctl registry login
+	ssh api docker pull --quiet $(REPO):$(VERSION)
+	# ssh api docker tag $(REPO):latest $(REPO):rollback
+	ssh api docker tag $(REPO):$(VERSION) $(REPO):latest
+	ssh api docker-compose -f /var/mindspun/docker-compose.marketing.yaml up -d
+.PHONY: website

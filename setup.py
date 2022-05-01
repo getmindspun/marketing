@@ -48,6 +48,10 @@ setuptools.setup(
             "pytest",
             "pytest-cov",
             "pytest-mock"
+        ],
+        "prod": [
+            "uvicorn",
+            "gunicorn"
         ]
     }
 )
