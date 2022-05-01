@@ -72,6 +72,7 @@ class Sent(BASE, DefaultMixin):
         """ Mark this email as opened """
         self.opened_at = datetime.utcnow()
 
+    @property
     def opened(self) -> bool:
         """ Was this email opened? s"""
         return self.opened_at is not None

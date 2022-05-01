@@ -16,7 +16,7 @@ def pixel(
 ) -> Response:
     """ Return a tracking pixel for email open """
     email: models.Sent = session.query(models.Sent).get(email_id)
-    if email:
+    if email and not email.opened:
         logger.info("Email opened by %s: %s", email.contact.email, email_id)
         email.open()
         session.commit()

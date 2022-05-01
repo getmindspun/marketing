@@ -26,13 +26,13 @@ def test_pixel(client, session):
     session.add(sent)
     session.commit()
 
-    assert not sent.opened()
+    assert not sent.opened
 
     res = client.get("/pixel.png", params={"id": sent.id})
     assert res.status_code == 200
 
     session.rollback()
-    assert sent.opened()
+    assert sent.opened
 
 
 def test_pixel_missing_id(client, mocker):
