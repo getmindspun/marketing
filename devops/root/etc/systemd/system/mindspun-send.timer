@@ -1,0 +1,11 @@
+[Unit]
+Description=Sending pending email periodically
+Requires=mindspun-send.service
+
+[Timer]
+Unit=mindspun-send.service
+OnActiveSec=0
+OnUnitInactiveSec=1min
+
+[Install]
+WantedBy=timers.target

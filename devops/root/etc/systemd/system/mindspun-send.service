@@ -1,0 +1,10 @@
+[Unit]
+Description=Send pending emails
+Wants=mindspun-send.timer
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/docker-compose -f /var/mindspun/docker-compose.marketing.yaml -p marketing run --rm marketing manage send
+
+[Install]
+WantedBy=multi-user.target

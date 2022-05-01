@@ -11,3 +11,5 @@ pip install -e .
 ```shell
 patch -p0 < lighthouse.patch
 ```
+
+### Systemd

@@ -59,3 +59,7 @@ deploy: build push
 	ssh api docker tag $(REPO):$(VERSION) $(REPO):latest
 	ssh api docker-compose -f /var/mindspun/docker-compose.marketing.yaml up -d
 .PHONY: website
+
+deploy-root:
+	scp -r devops/root/* api:/
+.PHONY: deploy-root
